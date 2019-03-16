@@ -123,17 +123,11 @@ class User{
     // get a user record
     function getDetails(){
         // Here is query to get all data for user from multiple tables
-        //TODO: There are few tables still need to add
         $query = "SELECT * FROM " . $this->table_name . " u
                 LEFT JOIN user_address ua on ua.user_id = u.id
-                LEFT JOIN user_experience ue on ue.user_id = u.id
                 LEFT JOIN user_cv uc on uc.user_id = u.id
                 WHERE u.id = :id";
-
-        // prepare the query
-        $stmt = $this->conn->prepare($query);          
-       
-        // unique ID of record to be edited
+        $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);
 
         // execute the query
@@ -148,34 +142,49 @@ class User{
             $address['premise'] = $row['premise'];
             $address['postalCode'] = $row['postalCode'];
             $address['locality'] = $row['locality'];
-
+            $address['role'] = $row['role'];
+            
             //Experience
-            $experience = [['id' => '1', 'from' => '2001', 'to' => '2002', 'employer' => 'ABC coporation', 'work' => 'Trainee'], 
-            ['id' => '2', 'from' => '2002', 'to' => '2004', 'employer' => 'XYZ coporation', 'work' => 'Junior Engineer'],
-             ['id' => '3', 'from' => '2004', 'to' => '2015', 'employer' => 'Rocket Talent', 'work' => 'Software Developer']];
- 
+            $experience = [];
+            $experience_query = "SELECT `id`, `from`, `to`, `employer`, `work` FROM user_experience
+                WHERE user_id = :id";
+            $stmt = $this->conn->prepare($experience_query);          
+            $stmt->bindParam(':id', $this->id);
+
+            // execute the query
+            if($stmt->execute()){                
+                $exprows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($stmt->rowCount() > 0) {
+                    foreach ($exprows as $record) {
+                        $experience[] = ['id' => $record['id'], 'from' => $record['from'], 'to' => $record['to'], 'employer' => $record['employer'], 'work' => $record['work']];
+                    }
+                    
+                }
+            }
+            
             //Match Making
             $matchMaking['jobSearch'] = "Active";
             $matchMaking['field'] =  ['105' => 'IT', '201' => 'Software', '206' => 'Law Firm', '307' => 'Accounting'];
             $matchMaking['locality'] = ['Europe', 'London', 'Germany'];
             $matchMaking['kindOfCompany'] = ['105' => 'IT', '201' => 'Software', '206' => 'Law Firm', '307' => 'Accounting'];
             $matchMaking['kindOfJobAd'] = ['105' => 'IT', '201' => 'Software', '206' => 'Law Firm', '307' => 'Accounting'];
-           
-            //CV
+
+            //CV - TODO: Get data from database and set it
             $cv['status'] = $row['status'];
-            $cv['universities'] = ["university-1", "university-2", "university-3"];
             $cv['phd'] = $row['phd'];
-            $cv['stipendium'] = ['Stipendium-1', 'Stipendium-2', 'Stipendium-3', 'Stipendium-4'];
             $cv['abitur'] = $row['abitur'];
             $cv['birthday'] = $row['birthday'];
             $cv['experience'] = $experience;
             $cv['address'] = $address;
             $cv['salaryDesired'] = $row['salaryDesired'];
+            $cv['universities'] = ["university-1", "university-2", "university-3"];
+            $cv['stipendium'] = ['Stipendium-1', 'Stipendium-2', 'Stipendium-3', 'Stipendium-4'];
 
             //User Profile
             $userProfile['firstName'] = $row['firstname'];
             $userProfile['lastName'] = $row['lastname'];
-            $userProfile['company'] = "abc";
+            $userProfile['company'] = $row['company'];
             $userProfile['matchMaking'] = $matchMaking;
             $userProfile['cv'] = $cv;
 
