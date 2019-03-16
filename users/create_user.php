@@ -52,5 +52,5 @@ if($user->create()){
 } 
 else{
     http_response_code(400);
-    echo json_encode(array("message" => "Unexpected error"));
+    echo json_encode(["message" => "Unexpected error"]);
 }

@@ -33,7 +33,7 @@ if($authToken){
 	//Check if any parameter missing
 	if (empty($data->mail) || empty($data->password) || empty($data->oldPassword || empty($_GET['userId']))) {
 		http_response_code(401);
-		echo json_encode(array("message" => "Insufficient Parameters"));
+		echo json_encode(["message" => "Insufficient Parameters"]);
 		exit;
 	}
 
@@ -41,7 +41,7 @@ if($authToken){
 	$email_exists = $user->emailExists(); 
 	if(!$email_exists || !password_verify($data->oldPassword, $user->password)){		
 		http_response_code(401);
-		echo json_encode(array("message" => "Wrong credentials"));
+		echo json_encode(["message" => "Wrong credentials"]);
 		exit;
 	}
     // if decode succeed, update user details
