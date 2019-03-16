@@ -1,0 +1,398 @@
+swagger: '2.0'
+info:
+  title: TalentRocket Jura API
+  description: The API for Backendaplicants testing
+  version: 1.0.0
+host: api.talentrocket.de
+schemes:
+  - https
+basePath: /
+produces:
+  - application/json
+paths:
+  '/users/{userId}':
+    get:
+      summary: Users
+      description: |
+        The users endpoint returns a user.
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the user that needs to be fetched
+          required: true
+          type: integer
+          format: int64
+        - in: query
+          name: authToken
+          description: The authToken of the logged in user
+          required: true
+          type: string
+      tags:
+        - User
+      responses:
+        '200':
+          description: Successful operation
+          schema:
+            $ref: '#/definitions/User'
+        '400':
+          description: Invalid id
+        '404':
+          description: Not found
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /users/login:
+    post:
+      summary: Users
+      description: |
+        The users login returns a auth token.
+      parameters:
+        - name: user
+          in: body
+          schema:
+            required:
+              - mail
+              - password
+            properties:
+              mail:
+                type: string
+                description: Mail of the user that tries to log in
+              password:
+                type: string
+                description: Password of the user that tries to log in
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns an auth token
+          schema:
+            type: object
+            properties:
+              authToken:
+                type: string
+                description: The auth token
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /users/register:
+    post:
+      summary: Users
+      description: |
+        The users register returns a auth token.
+      parameters:
+        - name: user
+          in: body
+          schema:
+            required:
+              - mail
+              - password
+            properties:
+              mail:
+                type: string
+                description: Mail of the user that tries to log in
+              password:
+                type: string
+                description: Password of the user that tries to log in
+              firstName:
+                type: string
+                description: First name of the new user
+              lastName:
+                type: string
+                description: Last name of the new user
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns an auth token
+          schema:
+            type: object
+            properties:
+              authToken:
+                type: string
+                description: The auth token
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/users/{userId}/updatecredentials':
+    post:
+      summary: Users
+      description: |
+        The users login returns a auth token.
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the user that needs to be fetched
+          required: true
+          type: integer
+          format: int64
+        - name: user
+          in: body
+          schema:
+            required:
+              - mail
+              - password
+              - oldPassword
+            properties:
+              mail:
+                type: string
+                description: Mail of the user that updates their credentials
+              password:
+                type: string
+                description: Password of the user that updates their credentials
+              oldPassword:
+                type: string
+                description: Old password of the user that updates their credentials
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns the user
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/users/{userId}/cv':
+    post:
+      summary: Users
+      description: |
+        The users cv endpoint saves a user cv.
+      parameters:
+        - name: user
+          in: body
+          schema:
+            $ref: /definitions/CV
+        - in: path
+          name: userId
+          description: Id of the user that needs to be fetched
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns the user
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  '/users/{userId}/cv/profile-pic':
+    post:
+      summary: Users
+      description: |
+        The User upload pic endpoint
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the user that needs to be fetched
+          required: true
+          type: integer
+          format: int64
+        - name: profilepic
+          in: body
+          schema:
+            required:
+              - file
+            properties:
+              file:
+                type: string
+                format: binary
+                description: File to be uploaded
+              authToken:
+                type: string
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns the user
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Users
+      description: |
+        The users cv delete pic endpoint deletes the user pic.
+      parameters:
+        - in: path
+          name: userId
+          description: Id of the user that needs to be fetched
+          required: true
+          type: integer
+          format: int64
+      tags:
+        - User
+      responses:
+        '200':
+          description: Returns success
+          schema:
+            $ref: '#/definitions/Success'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+  Term:
+    type: object
+    description: Term from taxonomy/vocabulary
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: ID of the term
+      name:
+        type: string
+        description: Human readable name of term
+  Address:
+    type: object
+    properties:
+      thoroughfare:
+        type: string
+        description: Street of the address
+      premise:
+        type: string
+        description: Premise of the address
+      postalCode:
+        type: string
+        description: Postal code of the address
+      locality:
+        type: string
+        description: Locality of the address
+  Timetable:
+    type: object
+    properties:
+      id:
+        type: string
+        description: Id of the timetable
+      from:
+        type: string
+        description: From when
+      to:
+        type: string
+        description: Till when
+      employer:
+        type: string
+        description: Which company/organization
+      work:
+        type: string
+        description: What kind of work
+  User:
+    type: object
+    properties:
+      mail:
+        type: string
+        description: Mailaddress of the user
+      role:
+        type: array
+        items:
+          type: string
+          description: Roles of the user
+      profile:
+        $ref: '#/definitions/UserProfile'
+  UserProfile:
+    type: object
+    properties:
+      firstName:
+        type: string
+        description: First name of the user
+      lastName:
+        type: string
+        description: Last name of the user
+      company:
+        type: object
+        description: 'Optional, only available when user has role company'
+        properties:
+          admin:
+            type: boolean
+            description: States if the user is a company admin
+      matchMaking:
+        $ref: '#/definitions/MatchMaking'
+      cv:
+        $ref: '#/definitions/CV'
+  CV:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Status of the user
+      universities:
+        type: array
+        items:
+          type: string
+          description: The universities the user attended
+      phd:
+        type: boolean
+        description: States if the user has a phd
+      stipendium:
+        type: array
+        items:
+          type: string
+          description: Stipendiums the user has
+      abitur:
+        type: integer
+        format: float
+        description: Abitur result of the user
+      birthday:
+        type: string
+        format: date
+        description: Birthday of the user
+      experience:
+        type: array
+        items:
+          $ref: '#/definitions/Timetable'
+      address:
+        $ref: '#/definitions/Address'
+      salaryDesired:
+        type: string
+        description: Desired salary
+  MatchMaking:
+    type: object
+    description: Matchmaking options
+    properties:
+      jobSearch:
+        type: string
+        description: Status of job search of user
+      field:
+        type: array
+        items:
+          $ref: '#/definitions/Term'
+      locality:
+        type: array
+        items:
+          type: string
+          description: Locality the user searches in which a job
+      kindOfCompany:
+        type: array
+        items:
+          $ref: '#/definitions/Term'
+      kindOfJobAd:
+        type: array
+        items:
+          $ref: '#/definitions/Term'
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+  Success:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

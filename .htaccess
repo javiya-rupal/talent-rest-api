@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+Options +FollowSymLinks
+RewriteEngine On
+ 
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+ 
+RewriteRule ^users/login$ users/login.php
+RewriteRule ^users/register$ users/create_user.php
+RewriteRule ^users/(\d+)$ users/get_user.php?userId=$1
+RewriteRule ^users/(\d+)/updatecredentials$ users/update_credentials.php?userId=$1
+
+</IfModule>
